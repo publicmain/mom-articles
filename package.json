@@ -1,0 +1,12 @@
+{
+  "name": "mom-articles",
+  "version": "1.0.0",
+  "description": "妈妈的美篇文章收藏",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.0"
+  }
+}
