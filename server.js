@@ -8,16 +8,7 @@ const PORT = process.env.PORT || 3000;
 // 注入到文章 HTML 中的移动端适配 CSS（最小化干预，保留美篇原始排版）
 const MOBILE_INJECT_CSS = `
 <style>
-  /* 美篇用 font-size:50px 作为 rem 基准，按 750px 设计 */
-  /* 换成 vw 单位让内容等比缩放适配任意屏幕宽度 */
-  html {
-    font-size: 6.667vw !important;  /* 50/750*100 = 6.667vw */
-    min-width: 0 !important;
-  }
-  body {
-    min-width: 0 !important;
-    overflow-x: hidden !important;
-  }
+  /* 不改任何尺寸，只隐藏导航栏 */
 
   /* 隐藏美篇顶部导航栏 */
   .layout-header,
@@ -94,10 +85,10 @@ app.get('/articles/:file', (req, res) => {
   // 1. 移除 min-width:750PX（美篇桌面端样式，手机上会过宽）
   html = html.replace(/min-width\s*:\s*750\s*PX/gi, 'min-width: 0');
 
-  // 2. 替换 viewport 中的 user-scalable=no，允许缩放
+  // 2. 设置 viewport 宽度为 750px，浏览器会自动等比缩放整个页面（文字+图片一起缩小）
   html = html.replace(
     /<meta[^>]*name=["']?viewport["']?[^>]*>/gi,
-    '<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">'
+    '<meta name="viewport" content="width=750">'
   );
 
   // 2. 注入适配 CSS 到 </head> 前
