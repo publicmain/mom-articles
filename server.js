@@ -85,6 +85,12 @@ app.get('/articles/:file', (req, res) => {
   // 1. 移除 min-width:750PX（美篇桌面端样式，手机上会过宽）
   html = html.replace(/min-width\s*:\s*750\s*PX/gi, 'min-width: 0');
 
+  // 2. 替换 viewport 中的 user-scalable=no，允许缩放
+  html = html.replace(
+    /<meta[^>]*name=["']?viewport["']?[^>]*>/gi,
+    '<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">'
+  );
+
   // 2. 注入适配 CSS 到 </head> 前
   if (html.includes('</head>')) {
     html = html.replace('</head>', MOBILE_INJECT_CSS + '</head>');
