@@ -8,110 +8,229 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
-      background: linear-gradient(135deg, #fce4ec 0%, #f3e5f5 50%, #e8eaf6 100%);
+      background: #faf5f0;
       min-height: 100vh;
-      padding: 20px;
+      padding: 0;
     }
-    .container {
-      max-width: 680px;
-      margin: 0 auto;
-    }
-    header {
+
+    /* 顶部装饰横幅 */
+    .banner {
+      background: linear-gradient(135deg, #e8d5b7 0%, #f0c9a6 40%, #d4a98a 100%);
+      padding: 50px 20px 60px;
       text-align: center;
-      padding: 40px 20px 30px;
+      position: relative;
+      overflow: hidden;
     }
-    header h1 {
-      font-size: 28px;
-      color: #5d4037;
-      margin-bottom: 8px;
+    .banner::before {
+      content: '';
+      position: absolute;
+      top: -40px; right: -40px;
+      width: 200px; height: 200px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 50%;
     }
-    header p {
-      color: #8d6e63;
+    .banner::after {
+      content: '';
+      position: absolute;
+      bottom: -60px; left: -30px;
+      width: 160px; height: 160px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 50%;
+    }
+    .banner h1 {
+      font-size: 32px;
+      color: #4a3728;
+      font-weight: 700;
+      letter-spacing: 2px;
+      position: relative;
+      z-index: 1;
+    }
+    .banner p {
+      color: #6d5443;
       font-size: 15px;
+      margin-top: 8px;
+      position: relative;
+      z-index: 1;
     }
+    .banner .decoration {
+      font-size: 14px;
+      color: #8b6f5a;
+      margin-top: 16px;
+      letter-spacing: 8px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* 波浪分隔 */
+    .wave {
+      background: linear-gradient(135deg, #e8d5b7 0%, #f0c9a6 40%, #d4a98a 100%);
+      margin-top: -1px;
+    }
+    .wave svg { display: block; width: 100%; height: 40px; }
+    .wave svg path { fill: #faf5f0; }
+
+    .container {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 10px 20px 60px;
+    }
+
+    .count-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 4px;
+      margin-bottom: 4px;
+    }
+    .count-badge {
+      font-size: 13px;
+      color: #a08068;
+      background: #f0e6da;
+      padding: 5px 14px;
+      border-radius: 20px;
+      font-weight: 500;
+    }
+    .sort-label {
+      font-size: 12px;
+      color: #bba898;
+    }
+
     .article-list {
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      padding: 0 4px;
+      gap: 14px;
     }
     .article-card {
       background: white;
-      border-radius: 16px;
-      padding: 20px 24px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+      border-radius: 14px;
+      padding: 22px 26px;
+      box-shadow: 0 1px 8px rgba(120,80,40,0.06);
       text-decoration: none;
       color: inherit;
-      transition: transform 0.2s, box-shadow 0.2s;
-      display: block;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      border: 1px solid rgba(200,170,140,0.12);
     }
     .article-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      transform: translateY(-3px);
+      box-shadow: 0 6px 24px rgba(120,80,40,0.1);
     }
     .article-card:active {
       transform: scale(0.98);
     }
+    .card-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+    .card-body { flex: 1; min-width: 0; }
     .article-title {
-      font-size: 17px;
+      font-size: 16px;
       font-weight: 600;
-      color: #37474f;
-      margin-bottom: 6px;
+      color: #3d2e22;
+      margin-bottom: 5px;
       line-height: 1.4;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .article-meta {
-      font-size: 13px;
-      color: #9e9e9e;
+      font-size: 12px;
+      color: #b8a696;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
+    .card-arrow {
+      color: #cdb9a7;
+      font-size: 18px;
+      flex-shrink: 0;
+      transition: transform 0.2s;
+    }
+    .article-card:hover .card-arrow {
+      transform: translateX(3px);
+      color: #a08068;
+    }
+
     .empty-state {
       text-align: center;
-      padding: 60px 20px;
-      color: #bdbdbd;
+      padding: 80px 20px;
+      color: #c4b0a0;
     }
-    .empty-state .icon { font-size: 48px; margin-bottom: 16px; }
+    .empty-state .icon { font-size: 52px; margin-bottom: 16px; }
     .empty-state p { font-size: 15px; }
-    .count-badge {
-      display: inline-block;
-      background: #e8f5e9;
-      color: #43a047;
-      font-size: 13px;
-      padding: 4px 12px;
-      border-radius: 20px;
-      margin-top: 12px;
+
+    /* 底部 */
+    .footer {
+      text-align: center;
+      padding: 30px 20px;
+      font-size: 12px;
+      color: #c8b8a8;
     }
   </style>
 </head>
 <body>
+  <div class="banner">
+    <h1>妈妈的文章收藏</h1>
+    <p>每一篇都值得珍藏的美好记录</p>
+    <div class="decoration">- - -</div>
+  </div>
+  <div class="wave">
+    <svg viewBox="0 0 1200 40" preserveAspectRatio="none">
+      <path d="M0,0 C300,40 900,40 1200,0 L1200,40 L0,40 Z"/>
+    </svg>
+  </div>
+
   <div class="container">
-    <header>
-      <h1>妈妈的文章收藏</h1>
-      <p>所有保存的美篇文章都在这里</p>
+    <div class="count-bar">
       <div class="count-badge" id="count"></div>
-    </header>
+      <div class="sort-label">按时间排序</div>
+    </div>
     <div class="article-list" id="list"></div>
+    <div class="footer">用心记录生活的点滴</div>
   </div>
 
   <script>
+    var colors = [
+      {bg:'#fef3e2',icon:'#f0a848'}, {bg:'#e8f5e9',icon:'#66bb6a'},
+      {bg:'#e3f2fd',icon:'#42a5f5'}, {bg:'#fce4ec',icon:'#ef5350'},
+      {bg:'#f3e5f5',icon:'#ab47bc'}, {bg:'#fff3e0',icon:'#ff7043'},
+    ];
+    var icons = ['&#x1F4D6;','&#x1F343;','&#x2728;','&#x1F338;','&#x1F30A;','&#x2600;&#xFE0F;'];
+
     fetch('/api/articles')
-      .then(r => r.json())
-      .then(articles => {
-        const list = document.getElementById('list');
-        const count = document.getElementById('count');
+      .then(function(r) { return r.json(); })
+      .then(function(articles) {
+        var list = document.getElementById('list');
+        var count = document.getElementById('count');
 
         if (articles.length === 0) {
-          list.innerHTML = '<div class="empty-state"><div class="icon">📝</div><p>还没有保存文章哦</p></div>';
+          list.innerHTML = '<div class="empty-state"><div class="icon">&#x1F4DD;</div><p>还没有保存文章哦</p></div>';
           count.style.display = 'none';
           return;
         }
 
-        count.textContent = '共 ' + articles.length + ' 篇文章';
+        count.textContent = '共 ' + articles.length + ' 篇';
 
-        list.innerHTML = articles.map(a =>
-          '<a class="article-card" href="/articles/' + encodeURIComponent(a.file) + '">' +
-            '<div class="article-title">' + a.name + '</div>' +
-            '<div class="article-meta">' + a.date + ' · ' + a.size + '</div>' +
-          '</a>'
-        ).join('');
+        list.innerHTML = articles.map(function(a, i) {
+          var c = colors[i % colors.length];
+          var ic = icons[i % icons.length];
+          return '<a class="article-card" href="/articles/' + encodeURIComponent(a.file) + '">' +
+            '<div class="card-icon" style="background:' + c.bg + '">' + ic + '</div>' +
+            '<div class="card-body">' +
+              '<div class="article-title">' + a.name + '</div>' +
+              '<div class="article-meta"><span>' + a.date + '</span><span>&middot;</span><span>' + a.size + '</span></div>' +
+            '</div>' +
+            '<div class="card-arrow">&rsaquo;</div>' +
+          '</a>';
+        }).join('');
       });
   </script>
 </body>
