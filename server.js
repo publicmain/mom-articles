@@ -5,51 +5,85 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// 注入到文章 HTML 中的移动端适配代码
-const MOBILE_INJECT = `
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+// 注入到文章 HTML 中的移动端适配代码（纯 CSS，注入到已有 head 内）
+const MOBILE_INJECT_CSS = `
 <style>
-  /* 移动端适配 - 强制内容适应屏幕宽度 */
+  /* === 覆盖美篇原始的 min-width:750PX === */
   html, body {
+    min-width: 0 !important;
     max-width: 100vw !important;
+    width: 100% !important;
     overflow-x: hidden !important;
+    font-size: 16px !important;
   }
+
+  /* === 隐藏美篇顶部导航栏、广告、侧边栏、底部下载提示 === */
+  .normal-tpl > :first-child,
+  .header-navs-qrcode,
+  [class*="header-nav"],
+  [class*="download"],
+  [class*="app-download"],
+  [class*="open-app"],
+  [class*="guide-app"],
+  .bar-item-iconfont,
+  .bar-item-pop,
+  .arrow,
+  .pswp,
+  .mp-reward-hand,
+  [class*="sf-toolbar"],
+  [class*="bp6-"] {
+    display: none !important;
+  }
+
+  /* === 隐藏美篇右侧浮动按钮（评论、点赞、分享）=== */
+  .abs-comment, .abs-praise, .abs-share,
+  [class*="abs-comment"], [class*="abs-praise"], [class*="abs-share"] {
+    display: none !important;
+  }
+
+  /* === 文章主体适配 === */
+  .mp-frame, .mp-article, .normal-tpl, [class*="mp-frame"] {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* === 所有元素不超过屏幕 === */
+  *, *::before, *::after {
+    max-width: 100vw !important;
+    box-sizing: border-box !important;
+  }
+
   img, video, canvas, svg, iframe {
     max-width: 100% !important;
     height: auto !important;
   }
-  /* 美篇文章内容区域自适应 */
-  .article-content, .content, .main-content,
-  [class*="article"], [class*="content"], [class*="wrapper"],
-  .rich_media_content, .rich_media_area_primary {
+
+  /* === 文字内容区域 === */
+  .mp-article-texts, .mp-content, .ql-block {
     max-width: 100% !important;
-    width: 100% !important;
-    padding-left: 12px !important;
-    padding-right: 12px !important;
-    box-sizing: border-box !important;
+    width: auto !important;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
   }
-  /* 处理固定宽度的元素 */
-  div, section, article, main, p {
-    max-width: 100% !important;
-    box-sizing: border-box !important;
+
+  /* === 标题区域 === */
+  .mp-article-caption-title {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+    font-size: 22px !important;
   }
-  /* 处理设置了固定宽度的内联样式 */
-  [style*="width: 10"] , [style*="width: 11"],
-  [style*="width: 12"], [style*="width: 13"],
-  [style*="width: 14"], [style*="width: 15"],
-  [style*="width:10"], [style*="width:11"],
-  [style*="width:12"], [style*="width:13"] {
-    width: 100% !important;
-    max-width: 100% !important;
-  }
-  /* 返回按钮 */
+
+  /* === 返回按钮 === */
   .back-to-list {
     position: fixed;
     bottom: 20px;
     right: 16px;
     z-index: 99999;
     background: rgba(74,55,40,0.85);
-    color: #fff;
+    color: #fff !important;
     text-decoration: none;
     padding: 10px 18px;
     border-radius: 24px;
@@ -98,17 +132,28 @@ app.get('/articles/:file', (req, res) => {
 
   let html = fs.readFileSync(filePath, 'utf-8');
 
-  // 注入 viewport 和 CSS 到 <head> 中
-  if (html.includes('<head>')) {
-    html = html.replace('<head>', '<head>' + MOBILE_INJECT);
-  } else if (html.includes('<HEAD>')) {
-    html = html.replace('<HEAD>', '<HEAD>' + MOBILE_INJECT);
+  // 1. 替换原有的 viewport 标签（美篇自带的 user-scalable=no 会导致问题）
+  html = html.replace(
+    /<meta[^>]*name=["']?viewport["']?[^>]*>/gi,
+    '<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">'
+  );
+
+  // 2. 移除原始 CSS 中的 min-width:750PX（美篇的桌面端样式）
+  html = html.replace(/min-width\s*:\s*750\s*PX/gi, 'min-width: 0');
+
+  // 3. 移除 html 标签上的 font-size:50px（美篇用的 rem 基准，手机上太大）
+  html = html.replace(/(<html[^>]*style=['"][^'"]*?)font-size\s*:\s*50px/gi, '$1font-size: 16px');
+
+  // 4. 注入适配 CSS 到 </head> 前（放在最后确保优先级最高）
+  if (html.includes('</head>')) {
+    html = html.replace('</head>', MOBILE_INJECT_CSS + '</head>');
+  } else if (html.includes('</HEAD>')) {
+    html = html.replace('</HEAD>', MOBILE_INJECT_CSS + '</HEAD>');
   } else {
-    // 没有 head 标签就加到最前面
-    html = MOBILE_INJECT + html;
+    html = MOBILE_INJECT_CSS + html;
   }
 
-  // 注入返回按钮到 </body> 前
+  // 5. 注入返回按钮到 </body> 前
   if (html.includes('</body>')) {
     html = html.replace('</body>', BACK_BUTTON + '</body>');
   } else if (html.includes('</BODY>')) {
