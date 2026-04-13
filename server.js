@@ -8,8 +8,13 @@ const PORT = process.env.PORT || 3000;
 // 注入到文章 HTML 中的移动端适配 CSS（最小化干预，保留美篇原始排版）
 const MOBILE_INJECT_CSS = `
 <style>
-  /* 去掉美篇桌面端最小宽度限制 */
-  html, body {
+  /* 美篇用 font-size:50px 作为 rem 基准，按 750px 设计 */
+  /* 换成 vw 单位让内容等比缩放适配任意屏幕宽度 */
+  html {
+    font-size: 6.667vw !important;  /* 50/750*100 = 6.667vw */
+    min-width: 0 !important;
+  }
+  body {
     min-width: 0 !important;
     overflow-x: hidden !important;
   }
