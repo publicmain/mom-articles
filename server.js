@@ -15,7 +15,11 @@ const MOBILE_INJECT_CSS = `
   }
 
   /* 隐藏美篇顶部导航栏 */
-  .normal-tpl > :first-child {
+  .layout-header,
+  .layout-header-wrapper,
+  [class*="header-nav"],
+  [class*="header-logo"],
+  [class*="header-editor"] {
     display: none !important;
   }
 
