@@ -8,7 +8,15 @@ const PORT = process.env.PORT || 3000;
 // 注入到文章 HTML 中的移动端适配 CSS（最小化干预，保留美篇原始排版）
 const MOBILE_INJECT_CSS = `
 <style>
-  /* 不改任何尺寸，只隐藏导航栏 */
+  /* 文字放大一倍 */
+  .ql-block, .mp-article-texts, .mp-article-texts-word,
+  .mp-content, p, span {
+    font-size: 200% !important;
+    line-height: 1.8 !important;
+  }
+  .mp-article-caption-title, .title {
+    font-size: 250% !important;
+  }
 
   /* 隐藏美篇顶部导航栏 */
   .layout-header,
