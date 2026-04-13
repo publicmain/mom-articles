@@ -5,78 +5,28 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// 注入到文章 HTML 中的移动端适配代码（纯 CSS，注入到已有 head 内）
+// 注入到文章 HTML 中的移动端适配 CSS（最小化干预，保留美篇原始排版）
 const MOBILE_INJECT_CSS = `
 <style>
-  /* === 覆盖美篇原始的 min-width:750PX === */
+  /* 去掉美篇桌面端最小宽度限制 */
   html, body {
     min-width: 0 !important;
-    max-width: 100vw !important;
-    width: 100% !important;
     overflow-x: hidden !important;
-    font-size: 16px !important;
   }
 
-  /* === 隐藏美篇顶部导航栏、广告、侧边栏、底部下载提示 === */
-  .normal-tpl > :first-child,
-  .header-navs-qrcode,
-  [class*="header-nav"],
-  [class*="download"],
-  [class*="app-download"],
-  [class*="open-app"],
-  [class*="guide-app"],
-  .bar-item-iconfont,
-  .bar-item-pop,
-  .arrow,
-  .pswp,
-  .mp-reward-hand,
-  [class*="sf-toolbar"],
-  [class*="bp6-"] {
+  /* 隐藏美篇顶部导航栏 */
+  .normal-tpl > :first-child {
     display: none !important;
   }
 
-  /* === 隐藏美篇右侧浮动按钮（评论、点赞、分享）=== */
+  /* 隐藏右侧浮动按钮（评论、点赞、分享）和 SingleFile 工具栏 */
   .abs-comment, .abs-praise, .abs-share,
-  [class*="abs-comment"], [class*="abs-praise"], [class*="abs-share"] {
+  .bar-item-pop, .arrow, .pswp,
+  [class*="sf-toolbar"], [class*="bp6-"] {
     display: none !important;
   }
 
-  /* === 文章主体适配 === */
-  .mp-frame, .mp-article, .normal-tpl, [class*="mp-frame"] {
-    min-width: 0 !important;
-    max-width: 100% !important;
-    width: 100% !important;
-    padding: 0 !important;
-    margin: 0 !important;
-  }
-
-  /* === 所有元素不超过屏幕 === */
-  *, *::before, *::after {
-    max-width: 100vw !important;
-    box-sizing: border-box !important;
-  }
-
-  img, video, canvas, svg, iframe {
-    max-width: 100% !important;
-    height: auto !important;
-  }
-
-  /* === 文字内容区域 === */
-  .mp-article-texts, .mp-content, .ql-block {
-    max-width: 100% !important;
-    width: auto !important;
-    padding-left: 16px !important;
-    padding-right: 16px !important;
-  }
-
-  /* === 标题区域 === */
-  .mp-article-caption-title {
-    padding-left: 16px !important;
-    padding-right: 16px !important;
-    font-size: 22px !important;
-  }
-
-  /* === 返回按钮 === */
+  /* 返回按钮 */
   .back-to-list {
     position: fixed;
     bottom: 20px;
@@ -132,19 +82,10 @@ app.get('/articles/:file', (req, res) => {
 
   let html = fs.readFileSync(filePath, 'utf-8');
 
-  // 1. 替换原有的 viewport 标签（美篇自带的 user-scalable=no 会导致问题）
-  html = html.replace(
-    /<meta[^>]*name=["']?viewport["']?[^>]*>/gi,
-    '<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">'
-  );
-
-  // 2. 移除原始 CSS 中的 min-width:750PX（美篇的桌面端样式）
+  // 1. 移除 min-width:750PX（美篇桌面端样式，手机上会过宽）
   html = html.replace(/min-width\s*:\s*750\s*PX/gi, 'min-width: 0');
 
-  // 3. 移除 html 标签上的 font-size:50px（美篇用的 rem 基准，手机上太大）
-  html = html.replace(/(<html[^>]*style=['"][^'"]*?)font-size\s*:\s*50px/gi, '$1font-size: 16px');
-
-  // 4. 注入适配 CSS 到 </head> 前（放在最后确保优先级最高）
+  // 2. 注入适配 CSS 到 </head> 前
   if (html.includes('</head>')) {
     html = html.replace('</head>', MOBILE_INJECT_CSS + '</head>');
   } else if (html.includes('</HEAD>')) {
@@ -153,7 +94,7 @@ app.get('/articles/:file', (req, res) => {
     html = MOBILE_INJECT_CSS + html;
   }
 
-  // 5. 注入返回按钮到 </body> 前
+  // 3. 注入返回按钮到 </body> 前
   if (html.includes('</body>')) {
     html = html.replace('</body>', BACK_BUTTON + '</body>');
   } else if (html.includes('</BODY>')) {
