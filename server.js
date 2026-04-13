@@ -8,16 +8,6 @@ const PORT = process.env.PORT || 3000;
 // 注入到文章 HTML 中的移动端适配 CSS（最小化干预，保留美篇原始排版）
 const MOBILE_INJECT_CSS = `
 <style>
-  /* 文字放大一倍 */
-  .ql-block, .mp-article-texts, .mp-article-texts-word,
-  .mp-content, p, span {
-    font-size: 200% !important;
-    line-height: 1.8 !important;
-  }
-  .mp-article-caption-title, .title {
-    font-size: 250% !important;
-  }
-
   /* 隐藏美篇顶部导航栏 */
   .layout-header,
   .layout-header-wrapper,
@@ -57,7 +47,26 @@ const MOBILE_INJECT_CSS = `
 </style>
 `;
 
-const BACK_BUTTON = '<a class="back-to-list" href="/">&#8592; &#x8FD4;&#x56DE;&#x5217;&#x8868;</a>';
+const BACK_BUTTON = `<a class="back-to-list" href="/">&#8592; &#x8FD4;&#x56DE;&#x5217;&#x8868;</a>
+<script>
+// 等页面加载完毕后放大文字
+document.addEventListener('DOMContentLoaded', function() {
+  var blocks = document.querySelectorAll('.ql-block, .mp-article-texts-word');
+  for (var i = 0; i < blocks.length; i++) {
+    var el = blocks[i];
+    var current = window.getComputedStyle(el).fontSize;
+    el.style.setProperty('font-size', (parseFloat(current) * 2) + 'px', 'important');
+    el.style.setProperty('line-height', '1.8', 'important');
+  }
+  // 标题
+  var titles = document.querySelectorAll('.mp-article-caption-title, .title-element');
+  for (var j = 0; j < titles.length; j++) {
+    var t = titles[j];
+    var cur = window.getComputedStyle(t).fontSize;
+    t.style.setProperty('font-size', (parseFloat(cur) * 2) + 'px', 'important');
+  }
+});
+</script>`;
 
 // 获取文章列表的 API
 app.get('/api/articles', (req, res) => {
